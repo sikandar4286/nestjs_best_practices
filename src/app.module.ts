@@ -7,6 +7,9 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import config from './config/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ProductModule } from './product/product.module';
+import { TenantsModule } from './tenants/tenants.module';
+import { TenantProductModule } from './tenant-product/tenant-product.module';
 
 @Module({
   imports: [
@@ -19,13 +22,31 @@ import { MongooseModule } from '@nestjs/mongoose';
       envFilePath: '.env',
     }),
     MongooseModule.forRootAsync({
+      connectionName: 'test',
       useFactory: async (configService: ConfigService) => {
+        // const uri = await configService.get('MONGODB_URI_TEST_DB');
         const uri = await configService.get('MONGODB_URI');
+
+        console.log(uri, 'uri_test');
 
         return { uri };
       },
       inject: [ConfigService],
     }),
+    MongooseModule.forRootAsync({
+      connectionName: 'tenant',
+      useFactory: async (configService: ConfigService) => {
+        const uri = await configService.get('MONGODB_URI_TENANT_DB');
+        // const uri = await configService.get('MONGODB_URI');
+        console.log(uri, 'uri_tenant');
+
+        return { uri };
+      },
+      inject: [ConfigService],
+    }),
+    ProductModule,
+    TenantsModule,
+    TenantProductModule,
   ],
   controllers: [AppController],
   providers: [AppService, Logger],

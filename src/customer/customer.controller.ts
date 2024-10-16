@@ -89,6 +89,11 @@ export class CustomerController {
     // );
   }
 
+  @Get('product')
+  findAllProduct() {
+    return this.customerService.findAllProduct();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.customerService.findOne(+id);
